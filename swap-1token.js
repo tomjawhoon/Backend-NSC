@@ -46,23 +46,24 @@ const main = async () => {
     // const WETHDAIPair = await Fetcher.fetchPairData(DAI, WETH[chainId]);
     // const route = new Route([DAIUSDCPair], DAI);
     // const trade = new Trade(route, new TokenAmount(DAI, '1000000000000000000'), TradeType.EXACT_INPUT)
-    const MKRWETHPair = await Fetcher.fetchPairData(MKR, WETH[chainId]);
-    const route = new Route([MKRWETHPair], WETH[chainId]);
+    const MKRWETHPair = await Fetcher.fetchPairData(MKR, DAI);
+    const route = new Route([MKRWETHPair], DAI);
     const amount = '0.005';
     console.log("amount", amount)
     const amountIn = web3.utils.toWei(amount, 'ether')
-    const trade = new Trade(route, new TokenAmount(WETH[chainId], amountIn), TradeType.EXACT_INPUT)
+    const trade = new Trade(route, new TokenAmount(DAI, amountIn), TradeType.EXACT_INPUT)
     const price = trade.executionPrice.toSignificant(6);
     console.log(`Trade ${amount} ETH to ` + price * amount + ` MKR`);
     const slippageTolerance = new Percent('100') // 50 bips, or 0.50%
     const amountOutMin = trade.minimumAmountOut(slippageTolerance).raw.toString()
-    const path = [WETH[MKR.chainId].address, MKR.address]
+    const path = [DAI.address, MKR.address]
     const to = walletInfo.address
     const deadline = Math.floor(Date.now() / 1000) + 60 * 20
     const value = trade.inputAmount.raw.toString()
-    //console.log(path);
-    //console.log(trade.inputAmount.raw.toString());
-    const res = await uniswapContract.methods.swapExactETHForTokens(
+    console.log(path);
+    console.log(trade.inputAmount.raw.toString());
+    const res = await uniswapContract.methods.swapExactTokensForTokens(
+        amountIn,
         amountOutMin,
         path,
         to,
