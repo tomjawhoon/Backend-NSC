@@ -24,13 +24,11 @@ const getMidPrice = async (TokenA, TokenB) => {
     const route = new Route([pair], TokenA);
     return +route.midPrice.toSignificant(6);
 }
-
 const getExecutionPrice = async (TokenA, TokenB, amount) => {
     const pair = await getPair(TokenA, TokenB);
     const route = new Route([pair], TokenA);
     const trade = new Trade(route, new TokenAmount(WETH[DAI.chainId], amount), TradeType.EXACT_INPUT)
 }
-
 const getAllPairMidPrices = async () => {
     const tokenNames = Object.keys(TOKENS);
     const tokenArr = Object.values(TOKENS);
@@ -42,7 +40,6 @@ const getAllPairMidPrices = async () => {
             console.log(tokenNames[i], tokenNames[j], priceMatrix[i][j]);
         }
     };
-
     return priceMatrix;
 }
 
@@ -50,8 +47,7 @@ const main = async () => {
     const priceMatrix = await getAllPairMidPrices();
     const names = Object.keys(TOKENS);
     console.log("priceMatrix", priceMatrix)
-    // console.log(priceMatrix);
-
+    // console.log(priceMatrix)
     const bestRoute = search(priceMatrix, names);
     console.log('max', bestRoute);
 }
