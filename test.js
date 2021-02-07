@@ -209,33 +209,32 @@ app.post('/swaptotalcoin', (req, res) => {
         return { total, contractnew }
     }
     const main = async () => {
-        let arr_amount = 0.001
+        let arr_amount = req.body.valueinput;
         let transaction_hash = []
+        console.log("arr_amount", arr_amount)
         //const result = await swap(TOKENS.USDC, TOKENS.ETH, arr_amount);
-        for (let i = 0; i < arr_algo.length; i++) {
-            console.log("IN", arr_amount)
-            if (i === arr_algo.length - 1) {
-                // arr[arr.length-1] length-1
-                // arr[0] length-1
-                const resultnew = await swap(TOKENS[arr_algo[arr_algo.length - 1]], TOKENS[arr_algo[0]], arr_amount)
-                console.log("token swap", TOKENS[arr_algo[arr_algo.length - 1]], TOKENS[arr_algo[0]])
-                arr_amount = resultnew.total;
-                arr_amount = arr_amount.toFixed(5);
-            } else {
-                const resultnew = await swap(TOKENS[arr_algo[i]], TOKENS[arr_algo[i + 1]], arr_amount)
-                console.log("token swap else", TOKENS[arr_algo[i]], TOKENS[arr_algo[i + 1]])
-                arr_amount = resultnew.total;
-                arr_amount = arr_amount.toFixed(5);
-                // arr[i]
-                // i + 1
+        try {
+            for (let i = 0; i < arr_algo.length; i++) {
+                if (i != arr_algo.length - 1) {
+                    console.log("IN", arr_amount)
+                    const resultnew = await swap(TOKENS[arr_algo[i]], TOKENS[arr_algo[i + 1]], arr_amount)
+                    console.log("token swap else", TOKENS[arr_algo[i]], TOKENS[arr_algo[i + 1]])
+                    arr_amount = resultnew.total;
+                    arr_amount = arr_amount.toFixed(10);
+                    //arr_amount = arr_amount.toFixed(10);
+                    console.log("hash =>", resultnew.contractnew);
+                    transaction_hash.push(resultnew.contractnew.transactionHash)
+                }
             }
+        } catch (error) {
+            console.error("error naja bally za", error)
         }
         console.log("arr_amount =======>", arr_amount);
+        console.log("transaction_hash", transaction_hash)
+
+        res.send({ arr_amount })
         // console.log(result.total);
-        // console.log(result.contractnew);
-
     }
-
     main()
 })
 //==============================================================================================================
