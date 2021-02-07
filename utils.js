@@ -20,9 +20,8 @@ const sender = (web3, contractAddress) => (methodData, { from, privateKey, value
         try {
             const data = methodData.encodeABI();
             const skBuffer = Buffer.from(privateKey.substr(2, privateKey.length), 'hex');
-
-            // const estimatedGas = await methodData.estimateGas({ from });
-            const estimatedGas = 1000000;
+            const estimatedGas = await methodData.estimateGas({ from });
+            // const estimatedGas = 1000000
 
             console.log('gas', estimatedGas)
 
@@ -59,7 +58,12 @@ const sender = (web3, contractAddress) => (methodData, { from, privateKey, value
     return promiEvent.eventEmitter;
 }
 
+const fromDecimal = (value, dec) => {
+    return value * Math.pow(10, dec);
+}
+
 module.exports = {
     getBlockchainNetwork,
-    sender
+    sender,
+    fromDecimal
 }
