@@ -209,7 +209,8 @@ app.post('/swaptotalcoin', (req, res) => {
         return { total, contractnew }
     }
     const main = async () => {
-        let arr_amount = req.body.valueinput;
+        // let arr_amount = req.body.valueinput;
+        let arr_amount = 0.001;
         let transaction_hash = []
         console.log("arr_amount", arr_amount)
         //const result = await swap(TOKENS.USDC, TOKENS.ETH, arr_amount);
@@ -220,7 +221,7 @@ app.post('/swaptotalcoin', (req, res) => {
                     const resultnew = await swap(TOKENS[arr_algo[i]], TOKENS[arr_algo[i + 1]], arr_amount)
                     console.log("token swap else", TOKENS[arr_algo[i]], TOKENS[arr_algo[i + 1]])
                     arr_amount = resultnew.total;
-                    arr_amount = arr_amount.toFixed(10);
+                    arr_amount = Number(arr_amount);
                     //arr_amount = arr_amount.toFixed(10);
                     console.log("hash =>", resultnew.contractnew);
                     transaction_hash.push(resultnew.contractnew.transactionHash)
@@ -232,7 +233,7 @@ app.post('/swaptotalcoin', (req, res) => {
         console.log("arr_amount =======>", arr_amount);
         console.log("transaction_hash", transaction_hash)
 
-        res.send({ arr_amount })
+        res.send({ arr_amount, transaction_hash })
         // console.log(result.total);
     }
     main()
