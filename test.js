@@ -29,10 +29,8 @@ app.post('/checkcoin', (req, res) => {
     let network = getDefaultProvider(getNetwork(chainId))
     const TOKENS = { //LINK ใช่ไม่ได้ , OMG ใช่ไม่ได้ , TUSD ใช่ไม่ได้
         'ETH': new Token(chainId, "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2", 18),
+        'USDC': new Token(chainId, "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48", 18),
         'MKR': new Token(chainId, '0x9f8F72aA9304c8B593d555F12eF6589cC3A579A2', 18),
-       // 'DAI': new Token(chainId, '0x6B175474E89094C44Da98b954EedeAC495271d0F', 18),
-        // 'UNI': new Token(chainId, "0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984", 18),
-         'USDT': new Token(chainId, "0xdAC17F958D2ee523a2206206994597C13D831ec7", 18),
     }
     //0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee = ETH
     //0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2 = WETH
@@ -64,7 +62,6 @@ app.post('/checkcoin', (req, res) => {
         };
         return priceMatrix;
     }
-
     const main = async () => {
         const priceMatrix = await getAllPairMidPrices();
         const names = Object.keys(TOKENS);
@@ -74,7 +71,6 @@ app.post('/checkcoin', (req, res) => {
         console.log('max', bestRoute);
         res.send({ bestRoute, valueinput })
     }
-
     main()
 })
 //==============================================================================================================
@@ -163,7 +159,10 @@ app.post('/swapcoin', (req, res) => {
 })
 
 app.post('/swaptotalcoin', (req, res) => {
-    console.log("Total way form From Frontend-algorithm", req.body.algorithm.data.bestRoute.bestRoute)
+    //console.log("Total way form From Frontend-algorithm", req.body.algorithm.data.bestRoute.bestRoute)
+    const algorithm = req.body.algorithm.data.bestRoute.bestRoute;
+    console.log("algorithm", algorithm.split(" -> "))//ETH -> MKR -> USDC -> ETH
+    const arr_algo = algorithm.split(" -> ")
     let chainId = ChainId.KOVAN
     let network = getDefaultProvider(getNetwork(chainId))
     let RouterContract = Uniswap(web3);
@@ -182,9 +181,9 @@ app.post('/swaptotalcoin', (req, res) => {
     const swap = async (TokenA, TokenB, amount) => {
         const pair = await getPair(TokenA, TokenB);
         const route = new Route([pair], TokenA);
-        console.log("amount", amount)
-        console.log("TokenA", TokenA)
-        console.log("TokenB", TokenB)
+        // console.log("amount", amount)
+        // console.log("TokenA", TokenA)
+        // console.log("TokenB", TokenB)
         const amountIn = fromDecimal(amount, TokenA.decimals);
         console.log({ amountIn })
         const trade = new Trade(route, new TokenAmount(TokenA, amountIn), TradeType.EXACT_INPUT);
@@ -199,7 +198,7 @@ app.post('/swaptotalcoin', (req, res) => {
         const to = walletInfo.address // should be a checksummed recipient address
         const deadline = Math.floor(Date.now() / 1000) + 60 * 20 // 20 minutes from the current Unix time
         console.log({ amountIn, amountOutMin: amountOutMin.toString(), to, deadline });
-        return RouterContract.methods.swapExactTokensForTokens(
+        const contractnew = await RouterContract.methods.swapExactTokensForTokens(
             web3.utils.toHex(amountIn),
             web3.utils.toHex(amountOutMin.toString()),
             path,
@@ -207,10 +206,34 @@ app.post('/swaptotalcoin', (req, res) => {
             deadline,
             { from: walletInfo.address, privateKey: walletInfo.privateKey }
         )
+        return { total, contractnew }
     }
     const main = async () => {
-        const result = await swap(TOKENS.ETH, TOKENS.USDC, 0.001);
-        console.log(result);
+        let arr_amount = 0.001
+        let transaction_hash = []
+        //const result = await swap(TOKENS.USDC, TOKENS.ETH, arr_amount);
+        for (let i = 0; i < arr_algo.length; i++) {
+            console.log("IN", arr_amount)
+            if (i === arr_algo.length - 1) {
+                // arr[arr.length-1] length-1
+                // arr[0] length-1
+                const resultnew = await swap(TOKENS[arr_algo[arr_algo.length - 1]], TOKENS[arr_algo[0]], arr_amount)
+                console.log("token swap", TOKENS[arr_algo[arr_algo.length - 1]], TOKENS[arr_algo[0]])
+                arr_amount = resultnew.total;
+                arr_amount = arr_amount.toFixed(5);
+            } else {
+                const resultnew = await swap(TOKENS[arr_algo[i]], TOKENS[arr_algo[i + 1]], arr_amount)
+                console.log("token swap else", TOKENS[arr_algo[i]], TOKENS[arr_algo[i + 1]])
+                arr_amount = resultnew.total;
+                arr_amount = arr_amount.toFixed(5);
+                // arr[i]
+                // i + 1
+            }
+        }
+        console.log("arr_amount =======>", arr_amount);
+        // console.log(result.total);
+        // console.log(result.contractnew);
+
     }
 
     main()
