@@ -14,10 +14,20 @@ const Router02 = (web3) => {
         const methodData = contract.methods.swapExactTokensForTokens(amountIn, amountOutMin, path, to, deadline);
         return sendTransaction(methodData, { from, privateKey, value });
     }
+
+    const swapExactETHForTokens = (amountOutMin, path, to, deadline, { from, privateKey, value }) => {
+        const methodData = contract.methods.swapExactETHForTokens(
+            amountOutMin,
+            path,
+            to,
+            deadline);
+        return sendTransaction(methodData, { from, privateKey, value });
+    }
     return {
         contract,
         methods: {
-            swapExactTokensForTokens
+            swapExactTokensForTokens,
+            swapExactETHForTokens
         },
         events: {
         }
