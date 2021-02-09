@@ -181,7 +181,7 @@ app.post('/swaptotalcoin', (req, res) => {
     const swap = async (TokenA, TokenB, amount) => {
         const pair = await getPair(TokenA, TokenB);
         const route = new Route([pair], TokenA);
-        // console.log("amount", amount)
+        console.log("amount", amount)
         // console.log("TokenA", TokenA)
         // console.log("TokenB", TokenB)
         const amountIn = fromDecimal(amount, TokenA.decimals);
@@ -198,19 +198,19 @@ app.post('/swaptotalcoin', (req, res) => {
         const to = walletInfo.address // should be a checksummed recipient address
         const deadline = Math.floor(Date.now() / 1000) + 60 * 20 // 20 minutes from the current Unix time
         console.log({ amountIn, amountOutMin: amountOutMin.toString(), to, deadline });
-        const contractnew = await RouterContract.methods.swapExactTokensForTokens(
-            web3.utils.toHex(amountIn),
-            web3.utils.toHex(amountOutMin.toString()),
-            path,
-            to,
-            deadline,
-            { from: walletInfo.address, privateKey: walletInfo.privateKey }
-        )
-        return { total, contractnew }
+        // const contractnew = await RouterContract.methods.swapExactTokensForTokens(
+        //     web3.utils.toHex(amountIn),
+        //     web3.utils.toHex(amountOutMin.toString()),
+        //     path,
+        //     to,
+        //     deadline,
+        //     { from: walletInfo.address, privateKey: walletInfo.privateKey }
+        // )
+        // return { total, contractnew }
     }
     const main = async () => {
-        // let arr_amount = req.body.valueinput;
-        let arr_amount = 0.001;
+        let arr_amount = req.body.valueinput;
+        // let arr_amount = 0.001;
         let transaction_hash = []
         console.log("arr_amount", arr_amount)
         //const result = await swap(TOKENS.USDC, TOKENS.ETH, arr_amount);
@@ -219,18 +219,22 @@ app.post('/swaptotalcoin', (req, res) => {
                 if (i != arr_algo.length - 1) {
                     console.log("IN", arr_amount)
                     const resultnew = await swap(TOKENS[arr_algo[i]], TOKENS[arr_algo[i + 1]], arr_amount)
-                    console.log("token swap else", TOKENS[arr_algo[i]], TOKENS[arr_algo[i + 1]])
-                    arr_amount = resultnew.total;
-                    arr_amount = Number(arr_amount);
-                    //arr_amount = arr_amount.toFixed(10);
-                    console.log("hash =>", resultnew.contractnew);
-                    transaction_hash.push(resultnew.contractnew.transactionHash)
+                   // console.log("token swap else", TOKENS[arr_algo[i]], TOKENS[arr_algo[i + 1]])
+                    // console.log("resultnew",resultnew)
+                    // // arr_amount = resultnew.total;
+                    // // arr_amount = `${arr_amount}`
+                    // // arr_amount =  Number(arr_amount);
+                    // // `${amount}e+${decimals}`;
+                    // console.log("show wei", arr_amount)
+                    // // arr_amount = arr_amount.toFixed(4);
+                    // // console.log("hash =>", resultnew.contractnew);
+                    // transaction_hash.push(resultnew.contractnew.transactionHash)
                 }
             }
         } catch (error) {
-            console.error("error naja bally za", error)
+            console.error("error ", error)
         }
-        console.log("arr_amount =======>", arr_amount);
+        console.log("arr_amount Last =======>", arr_amount);
         console.log("transaction_hash", transaction_hash)
 
         res.send({ arr_amount, transaction_hash })
