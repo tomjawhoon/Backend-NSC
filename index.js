@@ -846,6 +846,10 @@ app.post('/checkbalance', (req, res) => {
     checkBalances();
 })
 
+app.get('/test', (req, res) => {
+    res.send("success good job !!!!!")
+})
+
 const PORT = process.env.PORT || 5001;
 
 app.listen(PORT, () => {
