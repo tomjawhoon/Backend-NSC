@@ -225,8 +225,8 @@ app.post('/swaptotalcoin', (req, res) => {
                     arr_amount =  Number(arr_amount);
                     // `${amount}e+${decimals}`;
                     // console.log("show wei", arr_amount)
-                    arr_amount = arr_amount.toFixed(4);
-                    // arr_amount = arr_amount.toFixed(7);
+                    // arr_amount = arr_amount.toFixed(4);
+                    arr_amount = arr_amount.toFixed(9)
                     console.log("hash =>", resultnew.contractnew);
                     transaction_hash.push(resultnew.contractnew.transactionHash)
                 }
